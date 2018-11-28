@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="space_medium">8dp</dimen>
+    <dimen name="space_large">16dp</dimen>
+    <dimen name="font_medium">16sp</dimen>
+    <dimen name="width_progress_bar">46dp</dimen>
+    <dimen name="height_progress_bar">46dp</dimen>
+</resources>

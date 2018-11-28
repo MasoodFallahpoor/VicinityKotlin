@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">data</string>
+    <string name="server_unreachable">اینترنت وصل نیست</string>
+    <string name="error_unknown">خطای نامشخص</string>
+</resources>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="venueViewModel"
+            type="ir.fallahpoor.vicinity.venues.model.VenueViewModel"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/space_large"
+        android:layout_marginRight="@dimen/space_large"
+        tools:context=".venuedetails.view.VenueDetailsActivity">
+
+        <LinearLayout
+            android:id="@+id/content_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:paddingTop="@dimen/space_medium"
+                android:paddingBottom="@dimen/space_medium"
+                android:text="@string/address"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_medium"/>
+
+            <TextView
+                android:id="@+id/address_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right|top"
+                android:paddingTop="@dimen/space_medium"
+                android:paddingBottom="@dimen/space_large"
+                android:text="@{venueViewModel.location.address}"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="@dimen/font_medium"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:paddingTop="@dimen/space_medium"
+                android:paddingBottom="@dimen/space_medium"
+                android:text="@string/latitude"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_medium"/>
+
+            <TextView
+                android:id="@+id/latitude_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right|top"
+                android:paddingTop="@dimen/space_medium"
+                android:paddingBottom="@dimen/space_large"
+                android:text="@{String.valueOf(venueViewModel.location.latitude)}"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="@dimen/font_medium"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:paddingTop="@dimen/space_medium"
+                android:paddingBottom="@dimen/space_medium"
+                android:text="@string/longitude"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_medium"/>
+
+            <TextView
+                android:id="@+id/longitude_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right|top"
+                android:paddingTop="@dimen/space_medium"
+                android:paddingBottom="@dimen/space_large"
+                android:text="@{String.valueOf(venueViewModel.location.longitude)}"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="@dimen/font_medium"/>
+
+        </LinearLayout>
+
+        <include
+            android:id="@+id/try_again"
+            layout="@layout/try_again_layout"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <include
+            android:id="@+id/loading"
+            layout="@layout/loading_layout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
