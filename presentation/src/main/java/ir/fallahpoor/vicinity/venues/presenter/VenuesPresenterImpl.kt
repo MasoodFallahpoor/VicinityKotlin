@@ -1,11 +1,11 @@
 package ir.fallahpoor.vicinity.venues.presenter
 
+import android.util.Log
 import ir.fallahpoor.vicinity.BaseMvpPresenter
 import ir.fallahpoor.vicinity.common.ExceptionHandler
 import ir.fallahpoor.vicinity.domain.interactor.GetVenuesUseCase
 import ir.fallahpoor.vicinity.venues.model.VenuesDataMapper
 import ir.fallahpoor.vicinity.venues.view.VenuesView
-
 
 class VenuesPresenterImpl(
     private val getVenuesUseCase: GetVenuesUseCase,
@@ -24,6 +24,7 @@ class VenuesPresenterImpl(
         if (distanceInMeters(prevLatitude, prevLongitude, latitude, longitude) <=
             MAX_DISTANCE_TO_UPDATE_VENUES
         ) {
+            Log.d("@@@@@@", "returning")
             return
         }
 
@@ -49,6 +50,12 @@ class VenuesPresenterImpl(
             )
         addDisposable(d)
 
+    }
+
+    override fun detachView() {
+        super.detachView()
+        prevLatitude = 0.toDouble()
+        prevLongitude = 0.toDouble()
     }
 
     private fun distanceInMeters(

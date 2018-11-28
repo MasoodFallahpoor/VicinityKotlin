@@ -12,26 +12,28 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
-import com.hannesdorfmann.mosby3.mvp.MvpActivity
+import com.hannesdorfmann.mosby3.mvp.MvpFragment
 import ir.fallahpoor.vicinity.BuildConfig
 import ir.fallahpoor.vicinity.R
 import ir.fallahpoor.vicinity.app.App
-import ir.fallahpoor.vicinity.databinding.ActivityVenuesBinding
+import ir.fallahpoor.vicinity.databinding.FragmentVenuesBinding
 import ir.fallahpoor.vicinity.venues.di.DaggerVenuesComponent
 import ir.fallahpoor.vicinity.venues.model.VenueViewModel
 import ir.fallahpoor.vicinity.venues.presenter.VenuesPresenter
+import kotlinx.android.synthetic.main.fragment_venue_details.*
 import javax.inject.Inject
 
-class VenuesActivity : MvpActivity<VenuesView, VenuesPresenter>(), VenuesView {
+class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
 
     private companion object {
         private const val TAG = "@@@@@@"
@@ -44,27 +46,40 @@ class VenuesActivity : MvpActivity<VenuesView, VenuesPresenter>(), VenuesView {
     @Inject
     lateinit var venuesPresenter: VenuesPresenter
 
-    private lateinit var binding: ActivityVenuesBinding
+    private lateinit var binding: FragmentVenuesBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var lastLocation: Location? = null
     private lateinit var locationCallback: LocationCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         injectDependencies()
+        super.onCreate(savedInstanceState)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
 
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_venues)
+        binding = FragmentVenuesBinding.inflate(inflater, container, false)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        return binding.root
 
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+
+        super.onActivityCreated(savedInstanceState)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
         setupLocationCallback()
 
     }
 
     private fun injectDependencies() {
         DaggerVenuesComponent.builder()
-            .appComponent((application as App).getAppComponent())
+            .appComponent((activity?.application as App).getAppComponent())
             .build()
             .inject(this)
     }
@@ -100,14 +115,14 @@ class VenuesActivity : MvpActivity<VenuesView, VenuesPresenter>(), VenuesView {
 
     private fun isAccessFineLocationPermissionGranted(): Boolean {
         return ActivityCompat.checkSelfPermission(
-            this,
+            activity!!,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestPermission() {
         ActivityCompat.requestPermissions(
-            this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            activity!!, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
             REQUEST_CODE_ACCESS_FINE_LOCATION
         )
     }
@@ -133,7 +148,7 @@ class VenuesActivity : MvpActivity<VenuesView, VenuesPresenter>(), VenuesView {
             } else {
                 // Permission is denied either temporarily or permanently.
                 Snackbar.make(
-                    findViewById<View>(android.R.id.content),
+                    content_layout,
                     R.string.permission_denied_explanation,
                     Snackbar.LENGTH_INDEFINITE
                 )
@@ -149,22 +164,25 @@ class VenuesActivity : MvpActivity<VenuesView, VenuesPresenter>(), VenuesView {
         val locationSettingsRequest: LocationSettingsRequest = LocationSettingsRequest.Builder()
             .addLocationRequest(getLocationRequest())
             .build()
-        val settingsClient = LocationServices.getSettingsClient(this)
+        val settingsClient = LocationServices.getSettingsClient(activity!!)
         val task = settingsClient.checkLocationSettings(locationSettingsRequest)
 
-        task.addOnSuccessListener(this) {
+        task.addOnSuccessListener(activity!!) {
             log("All location settings are satisfied. Start location updates...")
             startLocationUpdates()
         }
 
-        task.addOnFailureListener(this) { e ->
+        task.addOnFailureListener(activity!!) { e ->
             val statusCode = (e as ApiException).statusCode
             when (statusCode) {
                 LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
                     log("Location settings are not satisfied. Attempting to upgrade location settings")
                     try {
                         val rae = e as ResolvableApiException
-                        rae.startResolutionForResult(this@VenuesActivity, REQUEST_CHECK_SETTINGS)
+                        rae.startResolutionForResult(
+                            activity!!,
+                            REQUEST_CHECK_SETTINGS
+                        )
                     } catch (sie: IntentSender.SendIntentException) {
                         log("PendingIntent unable to execute request.")
                     }
@@ -172,7 +190,7 @@ class VenuesActivity : MvpActivity<VenuesView, VenuesPresenter>(), VenuesView {
                 LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
                     val errorMessage = "Location settings are inadequate, and cannot be fixed here."
                     Snackbar.make(
-                        findViewById<View>(android.R.id.content),
+                        content_layout,
                         errorMessage,
                         Snackbar.LENGTH_LONG
                     )
@@ -219,7 +237,7 @@ class VenuesActivity : MvpActivity<VenuesView, VenuesPresenter>(), VenuesView {
                 Activity.RESULT_CANCELED -> {
                     log("Required location settings changes NOT made.")
                     Snackbar.make(
-                        findViewById<View>(android.R.id.content),
+                        content_layout,
                         R.string.location_disabled,
                         Snackbar.LENGTH_INDEFINITE
                     )
@@ -257,11 +275,11 @@ class VenuesActivity : MvpActivity<VenuesView, VenuesPresenter>(), VenuesView {
         binding.tryAgain.tryAgainLayout.visibility = View.GONE
         binding.venuesRecyclerView.visibility = View.VISIBLE
 
-        binding.venuesRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.venuesRecyclerView.layoutManager = LinearLayoutManager(activity!!)
         binding.venuesRecyclerView.addItemDecoration(
-            DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+            DividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL)
         )
-        val venuesAdapter = VenuesAdapter(this, venues)
+        val venuesAdapter = VenuesAdapter(activity!!, venues)
         binding.venuesRecyclerView.adapter = venuesAdapter
 
     }

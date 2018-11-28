@@ -5,6 +5,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.0-alpha03'
@@ -18,6 +19,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 
@@ -31,6 +33,7 @@ ext {
     rxJavaVersion = '2.1.9'
     daggerVersion = '2.19'
     injectVersion = '1'
+    navigationVersion = '1.0.0-alpha07'
     myCompileSdkVersion = 28
     myMinSdkVersion = 14
     myTargetSdkVersion = 28
