@@ -16,7 +16,7 @@
         tools:context=".presentation.venuedetails.view.VenueDetailsFragment">
 
         <LinearLayout
-            android:id="@+id/content_layout"
+            android:id="@+id/contentLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/space_large"
@@ -38,7 +38,7 @@
                 android:textSize="@dimen/font_medium"/>
 
             <TextView
-                android:id="@+id/address_text_view"
+                android:id="@+id/addressTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right|top"
@@ -59,7 +59,7 @@
                 android:textSize="@dimen/font_medium"/>
 
             <TextView
-                android:id="@+id/latitude_text_view"
+                android:id="@+id/latitudeTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right|top"
@@ -80,7 +80,7 @@
                 android:textSize="@dimen/font_medium"/>
 
             <TextView
-                android:id="@+id/longitude_text_view"
+                android:id="@+id/longitudeTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right|top"
@@ -93,7 +93,7 @@
         </LinearLayout>
 
         <include
-            android:id="@+id/try_again"
+            android:id="@+id/tryAgain"
             layout="@layout/try_again_layout"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"

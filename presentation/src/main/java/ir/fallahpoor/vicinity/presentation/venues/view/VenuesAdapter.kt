@@ -42,7 +42,7 @@ class VenuesAdapter internal constructor(
     }
 
     inner class VenueViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var venueNameTextView: TextView = itemView.findViewById(R.id.venue_name_text_view)
+        var venueNameTextView: TextView = itemView.findViewById(R.id.venueNameTextView)
     }
 
 }

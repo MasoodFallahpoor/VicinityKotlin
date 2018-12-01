@@ -3,13 +3,13 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/try_again_layout"
+        android:id="@+id/tryAgainLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white">
 
         <TextView
-            android:id="@+id/error_message_text_view"
+            android:id="@+id/errorMessageTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_medium"
@@ -22,15 +22,15 @@
             app:layout_constraintTop_toTopOf="parent"/>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/try_again_button"
+            android:id="@+id/tryAgainButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/error_message_text_view"
+            android:layout_below="@+id/errorMessageTextView"
             android:padding="14dp"
             android:text="@string/try_again"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/error_message_text_view"/>
+            app:layout_constraintTop_toBottomOf="@+id/errorMessageTextView"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

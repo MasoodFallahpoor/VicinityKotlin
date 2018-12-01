@@ -148,7 +148,7 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
             } else {
                 // Permission is denied either temporarily or permanently.
                 Snackbar.make(
-                    content_layout,
+                    contentLayout,
                     R.string.permission_denied_explanation,
                     Snackbar.LENGTH_INDEFINITE
                 )
@@ -190,7 +190,7 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
                 LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
                     val errorMessage = "Location settings are inadequate, and cannot be fixed here."
                     Snackbar.make(
-                        content_layout,
+                        contentLayout,
                         errorMessage,
                         Snackbar.LENGTH_LONG
                     )
@@ -237,7 +237,7 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
                 Activity.RESULT_CANCELED -> {
                     log("Required location settings changes NOT made.")
                     Snackbar.make(
-                        content_layout,
+                        contentLayout,
                         R.string.location_disabled,
                         Snackbar.LENGTH_INDEFINITE
                     )
