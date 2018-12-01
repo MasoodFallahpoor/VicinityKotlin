@@ -1,9 +1,8 @@
 package ir.fallahpoor.vicinity.presentation.venues.presenter
 
-import android.util.Log
+import ir.fallahpoor.vicinity.domain.interactor.GetVenuesUseCase
 import ir.fallahpoor.vicinity.presentation.BaseMvpPresenter
 import ir.fallahpoor.vicinity.presentation.common.ExceptionHandler
-import ir.fallahpoor.vicinity.domain.interactor.GetVenuesUseCase
 import ir.fallahpoor.vicinity.presentation.venues.model.VenuesDataMapper
 import ir.fallahpoor.vicinity.presentation.venues.view.VenuesView
 
@@ -24,7 +23,6 @@ class VenuesPresenterImpl(
         if (distanceInMeters(prevLatitude, prevLongitude, latitude, longitude) <=
             MAX_DISTANCE_TO_UPDATE_VENUES
         ) {
-            Log.d("@@@@@@", "returning")
             return
         }
 
