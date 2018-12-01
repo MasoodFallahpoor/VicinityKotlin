@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/venuesFragment"
-        android:name="ir.fallahpoor.vicinity.venues.view.VenuesFragment"
+        android:name="ir.fallahpoor.vicinity.presentation.venues.view.VenuesFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_venues">
         <action
@@ -21,7 +21,7 @@
 
     <fragment
         android:id="@+id/venueDetailsFragment"
-        android:name="ir.fallahpoor.vicinity.venuedetails.view.VenueDetailsFragment"
+        android:name="ir.fallahpoor.vicinity.presentation.venuedetails.view.VenueDetailsFragment"
         android:label="@string/venue_details"
         tools:layout="@layout/fragment_venue_details"/>
 
