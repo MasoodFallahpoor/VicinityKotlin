@@ -62,7 +62,7 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
     ): View? {
 
         super.onCreate(savedInstanceState)
-        binding = ir.fallahpoor.vicinity.databinding.FragmentVenuesBinding.inflate(inflater, container, false)
+        binding = FragmentVenuesBinding.inflate(inflater, container, false)
 
         return binding.root
 
