@@ -1,7 +1,6 @@
 package ir.fallahpoor.vicinity.presentation.venues.view
 
 import android.content.Context
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,6 @@ import androidx.annotation.NonNull
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import ir.fallahpoor.vicinity.R
-import ir.fallahpoor.vicinity.presentation.venuedetails.view.VenueDetailsFragment
 import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
 
 class VenuesAdapter internal constructor(
@@ -33,11 +31,8 @@ class VenuesAdapter internal constructor(
 
         holder.venueNameTextView.text = name
         holder.itemView.setOnClickListener {
-            val bundle = Bundle().apply {
-                putString(VenueDetailsFragment.KEY_VENUE_ID, id)
-            }
-            it.findNavController()
-                .navigate(R.id.action_venuesFragment_to_venueDetailsFragment, bundle)
+            val action = VenuesFragmentDirections.actionVenuesFragmentToVenueDetailsFragment(id)
+            it.findNavController().navigate(action)
         }
 
     }

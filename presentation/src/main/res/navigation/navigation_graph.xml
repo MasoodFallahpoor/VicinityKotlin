@@ -23,6 +23,10 @@
         android:id="@+id/venueDetailsFragment"
         android:name="ir.fallahpoor.vicinity.presentation.venuedetails.view.VenueDetailsFragment"
         android:label="@string/venue_details"
-        tools:layout="@layout/fragment_venue_details"/>
+        tools:layout="@layout/fragment_venue_details">
+        <argument
+            android:name="venueId"
+            app:argType="string"/>
+    </fragment>
 
 </navigation>
