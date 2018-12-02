@@ -121,8 +121,8 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
     }
 
     private fun requestPermission() {
-        ActivityCompat.requestPermissions(
-            activity!!, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+        requestPermissions(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
             REQUEST_CODE_ACCESS_FINE_LOCATION
         )
     }
