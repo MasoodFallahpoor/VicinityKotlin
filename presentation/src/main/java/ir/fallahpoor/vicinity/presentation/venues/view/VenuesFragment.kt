@@ -31,6 +31,7 @@ import ir.fallahpoor.vicinity.presentation.venues.di.DaggerVenuesComponent
 import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
 import ir.fallahpoor.vicinity.presentation.venues.presenter.VenuesPresenter
 import kotlinx.android.synthetic.main.fragment_venue_details.*
+import kotlinx.android.synthetic.main.fragment_venues.*
 import javax.inject.Inject
 
 class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
@@ -148,7 +149,7 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
             } else {
                 // Permission is denied either temporarily or permanently.
                 Snackbar.make(
-                    contentLayout,
+                    venuesRecyclerView,
                     R.string.permission_denied_explanation,
                     Snackbar.LENGTH_INDEFINITE
                 )
@@ -190,7 +191,7 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
                 LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
                     val errorMessage = "Location settings are inadequate, and cannot be fixed here."
                     Snackbar.make(
-                        contentLayout,
+                        venuesRecyclerView,
                         errorMessage,
                         Snackbar.LENGTH_LONG
                     )
