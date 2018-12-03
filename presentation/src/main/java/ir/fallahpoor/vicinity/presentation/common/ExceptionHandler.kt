@@ -8,14 +8,12 @@ import javax.inject.Inject
 class ExceptionHandler @Inject
 constructor(private val context: Context) {
 
-    fun parseException(throwable: Throwable): Error {
-
-        val resources = context.resources
+    fun parseException(throwable: Throwable): String {
 
         return if (throwable is IOException) {
-            Error(resources.getString(R.string.server_unreachable))
+            context.resources.getString(R.string.server_unreachable)
         } else {
-            Error(resources.getString(R.string.error_unknown))
+            context.resources.getString(R.string.error_unknown)
         }
 
     }

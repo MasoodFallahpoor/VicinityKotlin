@@ -3,7 +3,7 @@
     <string name="venue_details">Venue Details</string>
     <string name="try_again">تلاش دوباره</string>
     <string name="settings">تنظیمات</string>
-    <string name="permission_denied_explanation">دسترسی به موقیت مکانی برای کارکرد درست اپ ضروری است</string>
+    <string name="permission_denied_explanation">دسترسی به موقعیت مکانی برای کارکرد درست اپ ضروری است</string>
     <string name="location_disabled">موقعیت مکانی شما غیرفعال است</string>
     <string name="address">آدرس</string>
     <string name="latitude">عرض جغرافیایی</string>

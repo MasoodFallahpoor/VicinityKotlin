@@ -20,7 +20,7 @@ class VenuesRepositoryImpl(
     override fun getVenueDetails(venueId: String): Single<Venue> {
         return venuesDataSourceFactory.create(venueId)
             .getVenue(venueId)
-            .map(venuesEntityDataMapper::transformVenue);
+            .map(venuesEntityDataMapper::transformVenue)
     }
 
 }

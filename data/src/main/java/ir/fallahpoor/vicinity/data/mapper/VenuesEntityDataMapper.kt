@@ -22,12 +22,10 @@ constructor() {
 
     }
 
-    fun transformVenue(venueEntity: VenueEntity): Venue {
-        return Venue(venueEntity.id, venueEntity.name, transformLocation(venueEntity.location))
-    }
+    fun transformVenue(venueEntity: VenueEntity) =
+        Venue(venueEntity.id, venueEntity.name, transformLocation(venueEntity.location))
 
-    private fun transformLocation(locationEntity: LocationEntity): Location {
-        return Location(locationEntity.address, locationEntity.latitude, locationEntity.longitude)
-    }
+    private fun transformLocation(locationEntity: LocationEntity) =
+        Location(locationEntity.address, locationEntity.latitude, locationEntity.longitude)
 
 }

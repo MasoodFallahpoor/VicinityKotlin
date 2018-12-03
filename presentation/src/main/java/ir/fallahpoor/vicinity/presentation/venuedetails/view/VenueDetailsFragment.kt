@@ -12,6 +12,7 @@ import ir.fallahpoor.vicinity.presentation.app.App
 import ir.fallahpoor.vicinity.presentation.venuedetails.di.DaggerVenueDetailsComponent
 import ir.fallahpoor.vicinity.presentation.venuedetails.viewmodel.VenueDetailsViewModel
 import ir.fallahpoor.vicinity.presentation.venuedetails.viewmodel.VenueDetailsViewModelFactory
+import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
 import javax.inject.Inject
 
 class VenueDetailsFragment : Fragment() {
@@ -20,18 +21,6 @@ class VenueDetailsFragment : Fragment() {
     lateinit var venueDetailsViewModelFactory: VenueDetailsViewModelFactory
 
     private lateinit var binding: FragmentVenueDetailsBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        injectDependencies()
-        super.onCreate(savedInstanceState)
-    }
-
-    private fun injectDependencies() {
-        DaggerVenueDetailsComponent.builder()
-            .appComponent((activity?.application as App).getAppComponent())
-            .build()
-            .inject(this)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -46,47 +35,39 @@ class VenueDetailsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
+        injectDependencies()
+
         super.onActivityCreated(savedInstanceState)
 
-        val venueDetailsViewModel = ViewModelProviders.of(activity!!, venueDetailsViewModelFactory)
+        val venueDetailsViewModel = ViewModelProviders.of(this, venueDetailsViewModelFactory)
             .get(VenueDetailsViewModel::class.java)
-        setupSubscriptions(venueDetailsViewModel)
+
+        subscribeToViewModel(venueDetailsViewModel)
 
         venueDetailsViewModel.getVenueDetails(getVenueId())
 
     }
 
-    private fun setupSubscriptions(venueDetailsViewModel: VenueDetailsViewModel) {
+    private fun injectDependencies() {
+        DaggerVenueDetailsComponent.builder()
+            .appComponent((activity?.application as App).appComponent)
+            .build()
+            .inject(this)
+    }
 
-        venueDetailsViewModel.venueLiveData.observe(
-            activity!!,
-            Observer { venueViewModel ->
-                binding.venueViewModel = venueViewModel
-                binding.contentLayout.visibility = View.VISIBLE
-                binding.tryAgain.tryAgainLayout.visibility = View.GONE
-            })
+    private fun subscribeToViewModel(venueDetailsViewModel: VenueDetailsViewModel) {
+
+        venueDetailsViewModel.venueDetailsLiveData.observe(
+            this,
+            Observer { venueViewModel -> showVenueDetails(venueViewModel) })
 
         venueDetailsViewModel.showProgressLiveData.observe(
-            activity!!,
-            Observer { isVisible ->
-                if (isVisible) {
-                    binding.tryAgain.tryAgainLayout.visibility = View.GONE
-                    binding.loading.loadingLayout.visibility = View.VISIBLE
-                } else {
-                    binding.loading.loadingLayout.visibility = View.GONE
-                }
-            })
+            this,
+            Observer { show -> if (show) showLoading() else hideLoading() })
 
         venueDetailsViewModel.errorLiveData.observe(
-            activity!!,
-            Observer { errorMessage ->
-                binding.tryAgain.errorMessageTextView.text = errorMessage
-                binding.tryAgain.tryAgainButton.setOnClickListener {
-                    venueDetailsViewModel.getVenueDetails(getVenueId())
-                }
-                binding.tryAgain.tryAgainLayout.visibility = View.VISIBLE
-                binding.contentLayout.visibility = View.GONE
-            }
+            this,
+            Observer { errorMessage -> showError(errorMessage, venueDetailsViewModel) }
         )
 
     }
@@ -95,6 +76,30 @@ class VenueDetailsFragment : Fragment() {
         arguments?.let {
             return VenueDetailsFragmentArgs.fromBundle(it).venueId
         }
+    }
+
+    private fun showVenueDetails(venueViewModel: VenueViewModel) {
+        binding.venueViewModel = venueViewModel
+        binding.contentLayout.visibility = View.VISIBLE
+        binding.tryAgain.tryAgainLayout.visibility = View.GONE
+    }
+
+    private fun showLoading() {
+        binding.tryAgain.tryAgainLayout.visibility = View.GONE
+        binding.loading.loadingLayout.visibility = View.VISIBLE
+    }
+
+    private fun hideLoading() {
+        binding.loading.loadingLayout.visibility = View.GONE
+    }
+
+    private fun showError(errorMessage: String, venueDetailsViewModel: VenueDetailsViewModel) {
+        binding.tryAgain.errorMessageTextView.text = errorMessage
+        binding.tryAgain.tryAgainButton.setOnClickListener {
+            venueDetailsViewModel.getVenueDetails(getVenueId())
+        }
+        binding.tryAgain.tryAgainLayout.visibility = View.VISIBLE
+        binding.contentLayout.visibility = View.GONE
     }
 
 }

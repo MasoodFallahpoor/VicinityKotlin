@@ -16,25 +16,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
-import com.hannesdorfmann.mosby3.mvp.MvpFragment
 import ir.fallahpoor.vicinity.BuildConfig
 import ir.fallahpoor.vicinity.R
 import ir.fallahpoor.vicinity.databinding.FragmentVenuesBinding
 import ir.fallahpoor.vicinity.presentation.app.App
 import ir.fallahpoor.vicinity.presentation.venues.di.DaggerVenuesComponent
 import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
-import ir.fallahpoor.vicinity.presentation.venues.presenter.VenuesPresenter
+import ir.fallahpoor.vicinity.presentation.venues.viewmodel.VenuesViewModel
+import ir.fallahpoor.vicinity.presentation.venues.viewmodel.VenuesViewModelFactory
 import kotlinx.android.synthetic.main.fragment_venue_details.*
 import kotlinx.android.synthetic.main.fragment_venues.*
 import javax.inject.Inject
 
-class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
+class VenuesFragment : Fragment() {
 
     private companion object {
         private const val TAG = "@@@@@@"
@@ -45,17 +48,13 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
     }
 
     @Inject
-    lateinit var venuesPresenter: VenuesPresenter
+    lateinit var venuesViewModelFactory: VenuesViewModelFactory
 
     private lateinit var binding: FragmentVenuesBinding
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationClient: FusedLocationProviderClient
     private var lastLocation: Location? = null
     private lateinit var locationCallback: LocationCallback
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        injectDependencies()
-        super.onCreate(savedInstanceState)
-    }
+    private lateinit var venuesViewModel: VenuesViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,16 +70,24 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
+        injectDependencies()
+
         super.onActivityCreated(savedInstanceState)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
+        venuesViewModel = ViewModelProviders.of(this, venuesViewModelFactory)
+            .get(VenuesViewModel::class.java)
+
+        locationClient = LocationServices.getFusedLocationProviderClient(activity!!)
+
         setupLocationCallback()
+
+        subscribeToViewModel()
 
     }
 
     private fun injectDependencies() {
         DaggerVenuesComponent.builder()
-            .appComponent((activity?.application as App).getAppComponent())
+            .appComponent((activity?.application as App).appComponent)
             .build()
             .inject(this)
     }
@@ -88,25 +95,68 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
     private fun setupLocationCallback() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
-                if (locationResult == null) {
-                    log("Location: NULL")
-                } else {
-                    lastLocation = locationResult.lastLocation
+                locationResult?.let {
+                    lastLocation = it.lastLocation
                     log("Location: " + lastLocation?.longitude + "," + lastLocation?.longitude)
-                    getPresenter().getVenuesAround(
-                        lastLocation!!.latitude,
-                        lastLocation!!.longitude
-                    )
+                    venuesViewModel.getVenues(lastLocation!!.latitude, lastLocation!!.longitude)
                 }
             }
         }
+    }
+
+    private fun subscribeToViewModel() {
+
+        venuesViewModel.loadingLiveData.observe(
+            this,
+            Observer { show -> if (show) showLoading() else hideLoading() })
+
+        venuesViewModel.errorLiveData.observe(
+            this,
+            Observer { errorMessage -> showError(errorMessage) }
+        )
+
+        venuesViewModel.venuesLiveData.observe(
+            this,
+            Observer { venuesList -> showVenues(venuesList) })
+
+    }
+
+    private fun showLoading() {
+        binding.tryAgain.tryAgainLayout.visibility = View.GONE
+        binding.loading.loadingLayout.visibility = View.VISIBLE
+    }
+
+    private fun hideLoading() {
+        binding.loading.loadingLayout.visibility = View.GONE
+    }
+
+    private fun showError(errorMessage: String) {
+        binding.tryAgain.errorMessageTextView.text = errorMessage
+        binding.tryAgain.tryAgainButton.setOnClickListener {
+            venuesViewModel.getVenues(lastLocation!!.latitude, lastLocation!!.longitude)
+        }
+        binding.tryAgain.tryAgainLayout.visibility = View.VISIBLE
+        binding.venuesRecyclerView.visibility = View.GONE
+    }
+
+    private fun showVenues(venues: List<VenueViewModel>) {
+
+        binding.tryAgain.tryAgainLayout.visibility = View.GONE
+        binding.venuesRecyclerView.visibility = View.VISIBLE
+
+        binding.venuesRecyclerView.layoutManager = LinearLayoutManager(activity!!)
+        binding.venuesRecyclerView.addItemDecoration(
+            DividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL)
+        )
+        binding.venuesRecyclerView.adapter = VenuesAdapter(activity!!, venues)
+
     }
 
     override fun onStart() {
 
         super.onStart()
 
-        if (isAccessFineLocationPermissionGranted()) {
+        if (isLocationPermissionGranted()) {
             checkLocationSettings()
         } else {
             requestPermission()
@@ -114,55 +164,17 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
 
     }
 
-    private fun isAccessFineLocationPermissionGranted(): Boolean {
+    private fun isLocationPermissionGranted(): Boolean {
         return ActivityCompat.checkSelfPermission(
             activity!!,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun requestPermission() {
-        requestPermissions(
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            REQUEST_CODE_ACCESS_FINE_LOCATION
-        )
-    }
-
-    override fun onStop() {
-        super.onStop()
-        stopLocationUpdates()
-    }
-
-    private fun stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_CODE_ACCESS_FINE_LOCATION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                log("Permission granted")
-                checkLocationSettings()
-            } else {
-                // Permission is denied either temporarily or permanently.
-                Snackbar.make(
-                    venuesRecyclerView,
-                    R.string.permission_denied_explanation,
-                    Snackbar.LENGTH_INDEFINITE
-                )
-                    .setAction(R.string.settings) { launchAppSettings() }
-                    .show()
-            }
-        }
-    }
-
     @SuppressLint("MissingPermission")
     private fun checkLocationSettings() {
 
-        val locationSettingsRequest: LocationSettingsRequest = LocationSettingsRequest.Builder()
+        val locationSettingsRequest = LocationSettingsRequest.Builder()
             .addLocationRequest(getLocationRequest())
             .build()
         val settingsClient = LocationServices.getSettingsClient(activity!!)
@@ -202,9 +214,48 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
 
     }
 
+    private fun requestPermission() {
+        requestPermissions(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            REQUEST_CODE_ACCESS_FINE_LOCATION
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        stopLocationUpdates()
+    }
+
+    private fun stopLocationUpdates() {
+        locationClient.removeLocationUpdates(locationCallback)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == REQUEST_CODE_ACCESS_FINE_LOCATION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                log("Permission granted")
+                checkLocationSettings()
+            } else {
+                // Permission is denied either temporarily or permanently.
+                Snackbar.make(
+                    venuesRecyclerView,
+                    R.string.permission_denied_explanation,
+                    Snackbar.LENGTH_INDEFINITE
+                )
+                    .setAction(R.string.settings) { launchAppSettings() }
+                    .show()
+            }
+        }
+    }
+
+
     @SuppressLint("MissingPermission")
     private fun startLocationUpdates() {
-        fusedLocationClient.requestLocationUpdates(
+        locationClient.requestLocationUpdates(
             getLocationRequest(),
             locationCallback,
             Looper.myLooper()
@@ -245,44 +296,6 @@ class VenuesFragment : MvpFragment<VenuesView, VenuesPresenter>(), VenuesView {
                 }
             }
         }
-    }
-
-    override fun createPresenter(): VenuesPresenter {
-        return venuesPresenter
-    }
-
-    override fun showLoading() {
-        binding.tryAgain.tryAgainLayout.visibility = View.GONE
-        binding.loading.loadingLayout.visibility = View.VISIBLE
-    }
-
-    override fun hideLoading() {
-        binding.loading.loadingLayout.visibility = View.GONE
-    }
-
-    override fun showError(errorMessage: String) {
-        binding.tryAgain.errorMessageTextView.text = errorMessage
-        binding.tryAgain.tryAgainButton.setOnClickListener { _ ->
-            lastLocation?.let {
-                getPresenter().getVenuesAround(it.latitude, it.longitude)
-            }
-        }
-        binding.tryAgain.tryAgainLayout.visibility = View.VISIBLE
-        binding.venuesRecyclerView.visibility = View.GONE
-    }
-
-    override fun showVenues(venues: List<VenueViewModel>) {
-
-        binding.tryAgain.tryAgainLayout.visibility = View.GONE
-        binding.venuesRecyclerView.visibility = View.VISIBLE
-
-        binding.venuesRecyclerView.layoutManager = LinearLayoutManager(activity!!)
-        binding.venuesRecyclerView.addItemDecoration(
-            DividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL)
-        )
-        val venuesAdapter = VenuesAdapter(activity!!, venues)
-        binding.venuesRecyclerView.adapter = venuesAdapter
-
     }
 
     private fun log(message: String) {

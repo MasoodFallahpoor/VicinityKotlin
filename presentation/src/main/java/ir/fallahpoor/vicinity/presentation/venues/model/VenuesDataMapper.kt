@@ -31,8 +31,7 @@ constructor() {
         }
     }
 
-    private fun transformLocation(location: Location): LocationViewModel {
-        return LocationViewModel(location.address, location.latitude, location.longitude)
-    }
+    private fun transformLocation(location: Location) =
+        LocationViewModel(location.address, location.latitude, location.longitude)
 
 }

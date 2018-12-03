@@ -15,27 +15,34 @@ class VenueDetailsViewModel @Inject constructor(
     private val exceptionHandler: ExceptionHandler
 ) : ViewModel() {
 
-    val venueLiveData = MutableLiveData<VenueViewModel>()
+    val venueDetailsLiveData = MutableLiveData<VenueViewModel>()
     val showProgressLiveData = MutableLiveData<Boolean>()
     val errorLiveData = MutableLiveData<String>()
     private var disposable: Disposable? = null
 
     fun getVenueDetails(venueId: String) {
 
-        showProgressLiveData.value = true
+        if (venueDetailsLiveData.value == null) {
+            showProgressLiveData.value = true
+            loadVenueDetails(venueId)
+        }
+
+    }
+
+    private fun loadVenueDetails(venueId: String) {
 
         disposable = getVenueDetailsUseCase.execute(GetVenueDetailsUseCase.Inputs.forVenue(venueId))
+            .doFinally { showProgressLiveData.value = false }
             .subscribe(
                 { venue ->
-                    showProgressLiveData.value = false
-                    venueLiveData.postValue(venueDetailsDataMapper.transform(venue))
+                    venueDetailsLiveData.value = venueDetailsDataMapper.transform(venue)
                 },
                 { throwable ->
-                    showProgressLiveData.value = false
-                    errorLiveData.postValue(exceptionHandler.parseException(throwable).message)
+                    errorLiveData.value = exceptionHandler.parseException(throwable)
                 })
 
     }
+
 
     override fun onCleared() {
         super.onCleared()

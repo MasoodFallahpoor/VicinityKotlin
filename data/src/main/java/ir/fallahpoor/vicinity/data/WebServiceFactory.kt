@@ -15,10 +15,6 @@ constructor() {
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
 
-    fun <S> createService(serviceClass: Class<S>): S {
-        val builder = retrofitBuilder
-        val retrofit = builder.build()
-        return retrofit.create(serviceClass)
-    }
+    fun <S> createService(serviceClass: Class<S>): S = retrofitBuilder.build().create(serviceClass)
 
 }

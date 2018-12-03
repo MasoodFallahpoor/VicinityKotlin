@@ -5,19 +5,9 @@ import androidx.room.TypeConverters
 import ir.fallahpoor.vicinity.data.repository.DataConverter
 
 @Entity(tableName = "venues", primaryKeys = ["latitude", "longitude"])
-class Venues {
+class Venues(var latitude: Double, var longitude: Double, venues: List<VenueEntity>) {
 
-    var latitude: Double = 0.toDouble()
-    var longitude: Double = 0.toDouble()
     @TypeConverters(DataConverter::class)
-    var venues: List<VenueEntity>? = null
-
-    constructor()
-
-    constructor(latitude: Double, longitude: Double, venues: List<VenueEntity>) {
-        this.latitude = latitude
-        this.longitude = longitude
-        this.venues = venues
-    }
+    var venues: List<VenueEntity>? = venues
 
 }

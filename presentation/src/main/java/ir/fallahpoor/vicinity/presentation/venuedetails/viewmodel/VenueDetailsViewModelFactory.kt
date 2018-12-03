@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class VenueDetailsViewModelFactory @Inject
 constructor(
-    private val getVenuesUseCase: GetVenueDetailsUseCase,
+    private val getVenueDetailsUseCase: GetVenueDetailsUseCase,
     private val venueDetailsDataMapper: VenueDetailsDataMapper,
     private val exceptionHandler: ExceptionHandler
 ) : ViewModelProvider.Factory {
@@ -17,8 +17,9 @@ constructor(
     override fun <T : ViewModel?> create(viewModelClass: Class<T>): T {
 
         if (viewModelClass.isAssignableFrom(VenueDetailsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
             return VenueDetailsViewModel(
-                getVenuesUseCase,
+                getVenueDetailsUseCase,
                 venueDetailsDataMapper,
                 exceptionHandler
             ) as T

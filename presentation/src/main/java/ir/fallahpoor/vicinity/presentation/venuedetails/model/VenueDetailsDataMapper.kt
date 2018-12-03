@@ -9,12 +9,10 @@ import javax.inject.Inject
 class VenueDetailsDataMapper @Inject
 constructor() {
 
-    fun transform(venue: Venue): VenueViewModel {
-        return VenueViewModel(venue.id, venue.name, transformLocation(venue.location))
-    }
+    fun transform(venue: Venue) =
+        VenueViewModel(venue.id, venue.name, transformLocation(venue.location))
 
-    private fun transformLocation(location: Location): LocationViewModel {
-        return LocationViewModel(location.address, location.latitude, location.longitude)
-    }
+    private fun transformLocation(location: Location) =
+        LocationViewModel(location.address, location.latitude, location.longitude)
 
 }

@@ -28,9 +28,8 @@ constructor() : ThreadExecutor {
 
         private var counter = 0
 
-        override fun newThread(@NonNull runnable: Runnable): Thread {
-            return Thread(runnable, "android_" + counter++)
-        }
+        override fun newThread(@NonNull runnable: Runnable) =
+            Thread(runnable, "android_" + counter++)
 
     }
 
