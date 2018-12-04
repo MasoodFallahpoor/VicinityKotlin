@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.NonNull
-import androidx.navigation.findNavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import ir.fallahpoor.vicinity.R
 import ir.fallahpoor.vicinity.presentation.venues.model.VenueModel
@@ -32,7 +32,7 @@ class VenuesAdapter internal constructor(
         holder.venueNameTextView.text = name
         holder.itemView.setOnClickListener {
             val action = VenuesFragmentDirections.actionVenuesFragmentToVenueDetailsFragment(id)
-            it.findNavController().navigate(action)
+            Navigation.findNavController(it).navigate(action)
         }
 
     }
@@ -42,7 +42,7 @@ class VenuesAdapter internal constructor(
     }
 
     inner class VenueViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var venueNameTextView: TextView = itemView.findViewById(R.id.venueNameTextView)
+        val venueNameTextView: TextView = itemView.findViewById(R.id.venueNameTextView)
     }
 
 }

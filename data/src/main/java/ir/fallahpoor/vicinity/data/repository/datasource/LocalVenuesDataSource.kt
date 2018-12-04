@@ -8,12 +8,9 @@ import javax.inject.Inject
 class LocalVenuesDataSource @Inject
 constructor(private val venuesCache: VenuesCache) : VenuesDataSource {
 
-    override fun getVenues(latitude: Double, longitude: Double): Single<List<VenueEntity>> {
-        return venuesCache.getVenues()
-    }
+    override fun getVenues(latitude: Double, longitude: Double): Single<List<VenueEntity>> =
+        venuesCache.getVenues()
 
-    override fun getVenue(venueId: String): Single<VenueEntity> {
-        return venuesCache.getVenue(venueId)
-    }
+    override fun getVenue(venueId: String): Single<VenueEntity> = venuesCache.getVenue(venueId)
 
 }

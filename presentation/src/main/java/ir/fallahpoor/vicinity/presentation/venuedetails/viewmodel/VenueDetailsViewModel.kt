@@ -15,23 +15,21 @@ class VenueDetailsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val venueDetailsLiveData = MutableLiveData<VenueModel>()
-    val showProgressLiveData = MutableLiveData<Boolean>()
+    val loadingLiveData = MutableLiveData<Boolean>()
     val errorLiveData = MutableLiveData<String>()
     private var disposable: Disposable? = null
 
     fun getVenueDetails(venueId: String) {
-
         if (venueDetailsLiveData.value == null) {
-            showProgressLiveData.value = true
+            setLoading(true)
             loadVenueDetails(venueId)
         }
-
     }
 
     private fun loadVenueDetails(venueId: String) {
 
         disposable = getVenueDetailsUseCase.execute(GetVenueDetailsUseCase.Inputs.forVenue(venueId))
-            .doFinally { showProgressLiveData.value = false }
+            .doFinally { setLoading(false) }
             .subscribe(
                 { venue ->
                     venueDetailsLiveData.value = venueDetailsDataMapper.transform(venue)
@@ -42,10 +40,13 @@ class VenueDetailsViewModel @Inject constructor(
 
     }
 
-
     override fun onCleared() {
         super.onCleared()
         disposable?.dispose()
+    }
+
+    private fun setLoading(isLoading: Boolean) {
+        loadingLiveData.value = isLoading
     }
 
 }

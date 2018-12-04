@@ -11,16 +11,14 @@ class VenuesRepositoryImpl(
     private val venuesEntityDataMapper: VenuesEntityDataMapper
 ) : VenuesRepository {
 
-    override fun getVenuesAround(latitude: Double, longitude: Double): Single<List<Venue>> {
-        return venuesDataSourceFactory.create(latitude, longitude)
+    override fun getVenuesAround(latitude: Double, longitude: Double): Single<List<Venue>> =
+        venuesDataSourceFactory.create(latitude, longitude)
             .getVenues(latitude, longitude)
             .map(venuesEntityDataMapper::transform)
-    }
 
-    override fun getVenueDetails(venueId: String): Single<Venue> {
-        return venuesDataSourceFactory.create(venueId)
+    override fun getVenueDetails(venueId: String): Single<Venue> =
+        venuesDataSourceFactory.create(venueId)
             .getVenue(venueId)
             .map(venuesEntityDataMapper::transformVenue)
-    }
 
 }

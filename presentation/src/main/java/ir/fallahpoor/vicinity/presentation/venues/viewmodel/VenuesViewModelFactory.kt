@@ -17,11 +17,8 @@ constructor(
     override fun <T : ViewModel?> create(viewModelClass: Class<T>): T {
 
         if (viewModelClass.isAssignableFrom(VenuesViewModel::class.java)) {
-            return VenuesViewModel(
-                getVenuesUseCase,
-                venuesDataMapper,
-                exceptionParser
-            ) as T
+            @Suppress("UNCHECKED_CAST")
+            return VenuesViewModel(getVenuesUseCase, venuesDataMapper, exceptionParser) as T
         } else {
             throw IllegalArgumentException("Unknown ViewModel class");
         }

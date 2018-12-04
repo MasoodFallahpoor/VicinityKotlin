@@ -15,11 +15,7 @@ class CloudVenuesDataSource @Inject
 constructor(webServiceFactory: WebServiceFactory, private val venuesCache: VenuesCache) :
     VenuesDataSource {
 
-    private val venuesWebService: VenuesWebService
-
-    init {
-        venuesWebService = webServiceFactory.createService(VenuesWebService::class.java)
-    }
+    private val venuesWebService = webServiceFactory.createService(VenuesWebService::class.java)
 
     override fun getVenues(latitude: Double, longitude: Double): Single<List<VenueEntity>> {
 
@@ -37,11 +33,10 @@ constructor(webServiceFactory: WebServiceFactory, private val venuesCache: Venue
 
     }
 
-    override fun getVenue(venueId: String): Single<VenueEntity> {
-        return venuesWebService.getVenueDetails(venueId, CLIENT_ID, CLIENT_SECRET, VERSION)
+    override fun getVenue(venueId: String): Single<VenueEntity> =
+        venuesWebService.getVenueDetails(venueId, CLIENT_ID, CLIENT_SECRET, VERSION)
             .doOnSuccess { venueDetailsEntity -> venuesCache.saveVenue(venueDetailsEntity.response.venue) }
             .map { venueDetailsEntity -> venueDetailsEntity.response.venue }
-    }
 
     private interface VenuesWebService {
         @GET("search")

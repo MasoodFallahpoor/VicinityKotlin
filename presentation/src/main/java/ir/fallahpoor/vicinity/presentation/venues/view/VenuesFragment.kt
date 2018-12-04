@@ -33,7 +33,6 @@ import ir.fallahpoor.vicinity.presentation.venues.di.DaggerVenuesComponent
 import ir.fallahpoor.vicinity.presentation.venues.model.VenueModel
 import ir.fallahpoor.vicinity.presentation.venues.viewmodel.VenuesViewModel
 import ir.fallahpoor.vicinity.presentation.venues.viewmodel.VenuesViewModelFactory
-import kotlinx.android.synthetic.main.fragment_venue_details.*
 import kotlinx.android.synthetic.main.fragment_venues.*
 import javax.inject.Inject
 
@@ -41,7 +40,7 @@ class VenuesFragment : Fragment() {
 
     private companion object {
         private const val TAG = "@@@@@@"
-        private const val REQUEST_CHECK_SETTINGS = 100
+        private const val REQUEST_CODE_CHECK_LOCATION_SETTINGS = 100
         private const val REQUEST_CODE_ACCESS_FINE_LOCATION = 1000
         private const val UPDATE_INTERVAL_IN_MS: Long = 10000
         private const val FASTEST_UPDATE_INTERVAL_IN_MS: Long = 5000
@@ -70,26 +69,31 @@ class VenuesFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
-        injectDependencies()
+        injectViewModel()
 
         super.onActivityCreated(savedInstanceState)
 
-        venuesViewModel = ViewModelProviders.of(this, venuesViewModelFactory)
-            .get(VenuesViewModel::class.java)
-
-        locationClient = LocationServices.getFusedLocationProviderClient(activity!!)
-
+        setupVenuesViewModel()
+        setupLocationClient()
         setupLocationCallback()
-
         subscribeToViewModel()
 
     }
 
-    private fun injectDependencies() {
+    private fun injectViewModel() {
         DaggerVenuesComponent.builder()
             .appComponent((activity?.application as App).appComponent)
             .build()
             .inject(this)
+    }
+
+    private fun setupLocationClient() {
+        locationClient = LocationServices.getFusedLocationProviderClient(activity!!)
+    }
+
+    private fun setupVenuesViewModel() {
+        venuesViewModel = ViewModelProviders.of(this, venuesViewModelFactory)
+            .get(VenuesViewModel::class.java)
     }
 
     private fun setupLocationCallback() {
@@ -140,16 +144,17 @@ class VenuesFragment : Fragment() {
     }
 
     private fun showVenues(venues: List<VenueModel>) {
-
         binding.tryAgain.tryAgainLayout.visibility = View.GONE
-        binding.venuesRecyclerView.visibility = View.VISIBLE
+        setupRecyclerView(venues)
+    }
 
+    private fun setupRecyclerView(venues: List<VenueModel>) {
+        binding.venuesRecyclerView.visibility = View.VISIBLE
         binding.venuesRecyclerView.layoutManager = LinearLayoutManager(activity!!)
         binding.venuesRecyclerView.addItemDecoration(
             DividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL)
         )
         binding.venuesRecyclerView.adapter = VenuesAdapter(activity!!, venues)
-
     }
 
     override fun onStart() {
@@ -174,50 +179,44 @@ class VenuesFragment : Fragment() {
     @SuppressLint("MissingPermission")
     private fun checkLocationSettings() {
 
-        val locationSettingsRequest = LocationSettingsRequest.Builder()
-            .addLocationRequest(getLocationRequest())
-            .build()
-        val settingsClient = LocationServices.getSettingsClient(activity!!)
-        val task = settingsClient.checkLocationSettings(locationSettingsRequest)
+        val locationSettingsRequest = createLocationSettingsRequest()
 
-        task.addOnSuccessListener(activity!!) {
-            log("All location settings are satisfied. Start location updates...")
-            startLocationUpdates()
-        }
-
-        task.addOnFailureListener(activity!!) { e ->
-            val statusCode = (e as ApiException).statusCode
-            when (statusCode) {
-                LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
-                    log("Location settings are not satisfied. Attempting to upgrade location settings")
-                    try {
-                        val rae = e as ResolvableApiException
-                        rae.startResolutionForResult(
-                            activity!!,
-                            REQUEST_CHECK_SETTINGS
-                        )
-                    } catch (sie: IntentSender.SendIntentException) {
-                        log("PendingIntent unable to execute request.")
-                    }
-                }
-                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
-                    val errorMessage = "Location settings are inadequate, and cannot be fixed here."
-                    Snackbar.make(
-                        venuesRecyclerView,
-                        errorMessage,
-                        Snackbar.LENGTH_LONG
-                    )
+        LocationServices.getSettingsClient(activity!!)
+            .checkLocationSettings(locationSettingsRequest)
+            .addOnSuccessListener(activity!!) {
+                log("All location settings are satisfied. Start location updates...")
+                startLocationUpdates()
+            }
+            .addOnFailureListener(activity!!) { e ->
+                val statusCode = (e as ApiException).statusCode
+                when (statusCode) {
+                    LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> enableLocation(e)
+                    LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE ->
+                        log("Location settings are inadequate, and cannot be fixed here.")
                 }
             }
 
-        }
+    }
 
+    private fun createLocationSettingsRequest(): LocationSettingsRequest {
+        return LocationSettingsRequest.Builder()
+            .addLocationRequest(getLocationRequest())
+            .build()
+    }
+
+    private fun enableLocation(e: Exception) {
+        log("Location settings are not satisfied. Attempting to upgrade location settings")
+        try {
+            val rae = e as ResolvableApiException
+            rae.startResolutionForResult(activity!!, REQUEST_CODE_CHECK_LOCATION_SETTINGS)
+        } catch (ex: IntentSender.SendIntentException) {
+            log("PendingIntent unable to execute request.")
+        }
     }
 
     private fun requestPermission() {
         requestPermissions(
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            REQUEST_CODE_ACCESS_FINE_LOCATION
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_ACCESS_FINE_LOCATION
         )
     }
 
@@ -280,7 +279,7 @@ class VenuesFragment : Fragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_CHECK_SETTINGS) {
+        if (requestCode == REQUEST_CODE_CHECK_LOCATION_SETTINGS) {
             when (resultCode) {
                 Activity.RESULT_OK -> {
                     log("User made required location settings changes.")
@@ -289,7 +288,7 @@ class VenuesFragment : Fragment() {
                 Activity.RESULT_CANCELED -> {
                     log("Required location settings changes NOT made.")
                     Snackbar.make(
-                        contentLayout,
+                        venuesRecyclerView,
                         R.string.location_disabled,
                         Snackbar.LENGTH_INDEFINITE
                     )

@@ -15,7 +15,7 @@ class VenuesViewModel(
 ) : ViewModel() {
 
     private companion object {
-        private const val DISTANCE_THRESHOLD = 100
+        private const val DISTANCE_THRESHOLD_IN_METERS = 100
     }
 
     val venuesLiveData = MutableLiveData<List<VenueModel>>()
@@ -26,24 +26,31 @@ class VenuesViewModel(
     private var prevLongitude: Double = 0.toDouble()
 
     fun getVenues(latitude: Double, longitude: Double) {
-        if (venuesLiveData.value == null || isDistanceThresholdCrossed(latitude, longitude)) {
-            loadingLiveData.value = true
+        if (shouldLoadVenues(latitude, longitude)) {
+            setLoading(true)
             loadVenues(latitude, longitude)
         }
     }
 
+    private fun shouldLoadVenues(latitude: Double, longitude: Double) =
+        venuesLiveData.value == null || isDistanceThresholdCrossed(latitude, longitude)
+
     private fun isDistanceThresholdCrossed(latitude: Double, longitude: Double) =
-        distanceInMeters(prevLatitude, prevLongitude, latitude, longitude) > DISTANCE_THRESHOLD
+        distanceInMeters(
+            prevLatitude,
+            prevLongitude,
+            latitude,
+            longitude
+        ) > DISTANCE_THRESHOLD_IN_METERS
 
     private fun loadVenues(latitude: Double, longitude: Double) {
 
         disposable =
                 getVenuesUseCase.execute(GetVenuesUseCase.Inputs.forLocation(latitude, longitude))
-                    .doFinally { loadingLiveData.value = false }
+                    .doFinally { setLoading(false) }
                     .subscribe(
                         { venues ->
-                            prevLatitude = latitude
-                            prevLongitude = longitude
+                            saveCurrentLocation(latitude, longitude)
                             venuesLiveData.value = venuesDataMapper.transformVenues(venues)
                         },
                         { throwable ->
@@ -51,6 +58,11 @@ class VenuesViewModel(
                         }
                     )
 
+    }
+
+    private fun saveCurrentLocation(latitude: Double, longitude: Double) {
+        prevLatitude = latitude
+        prevLongitude = longitude
     }
 
     override fun onCleared() {
@@ -80,6 +92,10 @@ class VenuesViewModel(
 
         return Math.sqrt(distance)
 
+    }
+
+    private fun setLoading(isLoading: Boolean) {
+        loadingLiveData.value = isLoading
     }
 
 }

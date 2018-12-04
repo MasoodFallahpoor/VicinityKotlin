@@ -35,12 +35,11 @@ class VenueDetailsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
-        injectDependencies()
+        injectViewModel()
 
         super.onActivityCreated(savedInstanceState)
 
-        val venueDetailsViewModel = ViewModelProviders.of(this, venueDetailsViewModelFactory)
-            .get(VenueDetailsViewModel::class.java)
+        val venueDetailsViewModel = getVenueDetailsViewModel()
 
         subscribeToViewModel(venueDetailsViewModel)
 
@@ -48,12 +47,16 @@ class VenueDetailsFragment : Fragment() {
 
     }
 
-    private fun injectDependencies() {
+    private fun injectViewModel() {
         DaggerVenueDetailsComponent.builder()
             .appComponent((activity?.application as App).appComponent)
             .build()
             .inject(this)
     }
+
+    private fun getVenueDetailsViewModel() =
+        ViewModelProviders.of(this, venueDetailsViewModelFactory)
+            .get(VenueDetailsViewModel::class.java)
 
     private fun subscribeToViewModel(venueDetailsViewModel: VenueDetailsViewModel) {
 
@@ -61,7 +64,7 @@ class VenueDetailsFragment : Fragment() {
             this,
             Observer { venueViewModel -> showVenueDetails(venueViewModel) })
 
-        venueDetailsViewModel.showProgressLiveData.observe(
+        venueDetailsViewModel.loadingLiveData.observe(
             this,
             Observer { show -> if (show) showLoading() else hideLoading() })
 

@@ -10,20 +10,14 @@ internal constructor(
     private val cloudVenuesDataStore: CloudVenuesDataSource
 ) {
 
-    fun create(latitude: Double, longitude: Double): VenuesDataSource {
-        return if (venuesCache.venuesExistFor(latitude, longitude)) {
+    fun create(latitude: Double, longitude: Double): VenuesDataSource =
+        if (venuesCache.venuesExistFor(latitude, longitude)) {
             localVenuesDataStore
         } else {
             cloudVenuesDataStore
         }
-    }
 
-    fun create(venueId: String): VenuesDataSource {
-        return if (venuesCache.venueExists(venueId)) {
-            localVenuesDataStore
-        } else {
-            cloudVenuesDataStore
-        }
-    }
+    fun create(venueId: String): VenuesDataSource =
+        if (venuesCache.venueExists(venueId)) localVenuesDataStore else cloudVenuesDataStore
 
 }
