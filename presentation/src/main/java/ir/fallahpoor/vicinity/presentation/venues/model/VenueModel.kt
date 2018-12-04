@@ -1,7 +1,7 @@
 package ir.fallahpoor.vicinity.presentation.venues.model
 
-data class VenueViewModel(
+data class VenueModel(
     var id: String,
     var name: String,
-    var location: LocationViewModel
+    var location: LocationModel
 )

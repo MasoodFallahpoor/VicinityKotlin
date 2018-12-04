@@ -7,7 +7,7 @@
 
         <variable
             name="venueViewModel"
-            type="ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel"/>
+            type="ir.fallahpoor.vicinity.presentation.venues.model.VenueModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

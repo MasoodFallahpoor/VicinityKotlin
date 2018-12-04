@@ -12,7 +12,7 @@ import ir.fallahpoor.vicinity.presentation.app.App
 import ir.fallahpoor.vicinity.presentation.venuedetails.di.DaggerVenueDetailsComponent
 import ir.fallahpoor.vicinity.presentation.venuedetails.viewmodel.VenueDetailsViewModel
 import ir.fallahpoor.vicinity.presentation.venuedetails.viewmodel.VenueDetailsViewModelFactory
-import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
+import ir.fallahpoor.vicinity.presentation.venues.model.VenueModel
 import javax.inject.Inject
 
 class VenueDetailsFragment : Fragment() {
@@ -78,8 +78,8 @@ class VenueDetailsFragment : Fragment() {
         }
     }
 
-    private fun showVenueDetails(venueViewModel: VenueViewModel) {
-        binding.venueViewModel = venueViewModel
+    private fun showVenueDetails(venueModel: VenueModel) {
+        binding.venueViewModel = venueModel
         binding.contentLayout.visibility = View.VISIBLE
         binding.tryAgain.tryAgainLayout.visibility = View.GONE
     }

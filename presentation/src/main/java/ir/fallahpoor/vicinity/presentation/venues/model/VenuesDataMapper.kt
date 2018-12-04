@@ -8,30 +8,30 @@ import javax.inject.Inject
 class VenuesDataMapper @Inject
 constructor() {
 
-    fun transformVenues(venues: List<Venue>?): List<VenueViewModel> {
+    fun transformVenues(venues: List<Venue>?): List<VenueModel> {
 
-        val venueViewModels: MutableList<VenueViewModel>
+        val venueModels: MutableList<VenueModel>
 
         if (venues != null && venues.isNotEmpty()) {
-            venueViewModels = ArrayList()
+            venueModels = ArrayList()
             for (venue in venues) {
-                venueViewModels.add(transformVenue(venue))
+                venueModels.add(transformVenue(venue))
             }
         } else {
-            venueViewModels = Collections.emptyList()
+            venueModels = Collections.emptyList()
         }
 
-        return venueViewModels
+        return venueModels
 
     }
 
-    private fun transformVenue(venue: Venue?): VenueViewModel {
+    private fun transformVenue(venue: Venue?): VenueModel {
         venue?.let {
-            return VenueViewModel(it.id, it.name, transformLocation(it.location))
+            return VenueModel(it.id, it.name, transformLocation(it.location))
         }
     }
 
     private fun transformLocation(location: Location) =
-        LocationViewModel(location.address, location.latitude, location.longitude)
+        LocationModel(location.address, location.latitude, location.longitude)
 
 }

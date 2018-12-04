@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import io.reactivex.disposables.Disposable
 import ir.fallahpoor.vicinity.domain.interactor.GetVenueDetailsUseCase
 import ir.fallahpoor.vicinity.presentation.common.ExceptionParser
-import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
+import ir.fallahpoor.vicinity.presentation.venues.model.VenueModel
 import javax.inject.Inject
 
 class VenueDetailsViewModel @Inject constructor(
@@ -14,7 +14,7 @@ class VenueDetailsViewModel @Inject constructor(
     private val exceptionParser: ExceptionParser
 ) : ViewModel() {
 
-    val venueDetailsLiveData = MutableLiveData<VenueViewModel>()
+    val venueDetailsLiveData = MutableLiveData<VenueModel>()
     val showProgressLiveData = MutableLiveData<Boolean>()
     val errorLiveData = MutableLiveData<String>()
     private var disposable: Disposable? = null

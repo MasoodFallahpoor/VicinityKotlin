@@ -9,11 +9,11 @@ import androidx.annotation.NonNull
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import ir.fallahpoor.vicinity.R
-import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
+import ir.fallahpoor.vicinity.presentation.venues.model.VenueModel
 
 class VenuesAdapter internal constructor(
     context: Context,
-    private val places: List<VenueViewModel>
+    private val places: List<VenueModel>
 ) : RecyclerView.Adapter<VenuesAdapter.VenueViewHolder>() {
 
     private val layoutInflater: LayoutInflater =

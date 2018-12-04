@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import io.reactivex.disposables.Disposable
 import ir.fallahpoor.vicinity.domain.interactor.GetVenuesUseCase
 import ir.fallahpoor.vicinity.presentation.common.ExceptionParser
-import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
+import ir.fallahpoor.vicinity.presentation.venues.model.VenueModel
 import ir.fallahpoor.vicinity.presentation.venues.model.VenuesDataMapper
 
 class VenuesViewModel(
@@ -18,7 +18,7 @@ class VenuesViewModel(
         private const val DISTANCE_THRESHOLD = 100
     }
 
-    val venuesLiveData = MutableLiveData<List<VenueViewModel>>()
+    val venuesLiveData = MutableLiveData<List<VenueModel>>()
     val loadingLiveData = MutableLiveData<Boolean>()
     val errorLiveData = MutableLiveData<String>()
     private var disposable: Disposable? = null

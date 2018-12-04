@@ -30,7 +30,7 @@ import ir.fallahpoor.vicinity.R
 import ir.fallahpoor.vicinity.databinding.FragmentVenuesBinding
 import ir.fallahpoor.vicinity.presentation.app.App
 import ir.fallahpoor.vicinity.presentation.venues.di.DaggerVenuesComponent
-import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
+import ir.fallahpoor.vicinity.presentation.venues.model.VenueModel
 import ir.fallahpoor.vicinity.presentation.venues.viewmodel.VenuesViewModel
 import ir.fallahpoor.vicinity.presentation.venues.viewmodel.VenuesViewModelFactory
 import kotlinx.android.synthetic.main.fragment_venue_details.*
@@ -139,7 +139,7 @@ class VenuesFragment : Fragment() {
         binding.venuesRecyclerView.visibility = View.GONE
     }
 
-    private fun showVenues(venues: List<VenueViewModel>) {
+    private fun showVenues(venues: List<VenueModel>) {
 
         binding.tryAgain.tryAgainLayout.visibility = View.GONE
         binding.venuesRecyclerView.visibility = View.VISIBLE
