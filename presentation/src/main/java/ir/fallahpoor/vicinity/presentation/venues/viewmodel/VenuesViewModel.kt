@@ -4,14 +4,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.disposables.Disposable
 import ir.fallahpoor.vicinity.domain.interactor.GetVenuesUseCase
-import ir.fallahpoor.vicinity.presentation.common.ExceptionHandler
+import ir.fallahpoor.vicinity.presentation.common.ExceptionParser
 import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
 import ir.fallahpoor.vicinity.presentation.venues.model.VenuesDataMapper
 
 class VenuesViewModel(
     private val getVenuesUseCase: GetVenuesUseCase,
     private val venuesDataMapper: VenuesDataMapper,
-    private val exceptionHandler: ExceptionHandler
+    private val exceptionParser: ExceptionParser
 ) : ViewModel() {
 
     private companion object {
@@ -47,7 +47,7 @@ class VenuesViewModel(
                             venuesLiveData.value = venuesDataMapper.transformVenues(venues)
                         },
                         { throwable ->
-                            errorLiveData.value = exceptionHandler.parseException(throwable)
+                            errorLiveData.value = exceptionParser.parseException(throwable)
                         }
                     )
 

@@ -9,7 +9,7 @@ import ir.fallahpoor.vicinity.data.repository.VenuesRepositoryImpl
 import ir.fallahpoor.vicinity.data.repository.datasource.VenuesDataSourceFactory
 import ir.fallahpoor.vicinity.domain.interactor.GetVenuesUseCase
 import ir.fallahpoor.vicinity.domain.repository.VenuesRepository
-import ir.fallahpoor.vicinity.presentation.common.ExceptionHandler
+import ir.fallahpoor.vicinity.presentation.common.ExceptionParser
 import ir.fallahpoor.vicinity.presentation.venues.model.VenuesDataMapper
 import ir.fallahpoor.vicinity.presentation.venues.viewmodel.VenuesViewModelFactory
 
@@ -19,8 +19,8 @@ class VenuesModule {
     @Provides
     internal fun provideVenuesViewModelFactory(
         getVenuesUseCase: GetVenuesUseCase, venuesDataMapper: VenuesDataMapper,
-        exceptionHandler: ExceptionHandler
-    ) = VenuesViewModelFactory(getVenuesUseCase, venuesDataMapper, exceptionHandler)
+        exceptionParser: ExceptionParser
+    ) = VenuesViewModelFactory(getVenuesUseCase, venuesDataMapper, exceptionParser)
 
 
     @Provides

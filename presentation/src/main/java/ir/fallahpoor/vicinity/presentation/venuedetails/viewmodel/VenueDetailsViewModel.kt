@@ -4,15 +4,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.disposables.Disposable
 import ir.fallahpoor.vicinity.domain.interactor.GetVenueDetailsUseCase
-import ir.fallahpoor.vicinity.presentation.common.ExceptionHandler
-import ir.fallahpoor.vicinity.presentation.venuedetails.model.VenueDetailsDataMapper
+import ir.fallahpoor.vicinity.presentation.common.ExceptionParser
 import ir.fallahpoor.vicinity.presentation.venues.model.VenueViewModel
 import javax.inject.Inject
 
 class VenueDetailsViewModel @Inject constructor(
     private val getVenueDetailsUseCase: GetVenueDetailsUseCase,
     private val venueDetailsDataMapper: VenueDetailsDataMapper,
-    private val exceptionHandler: ExceptionHandler
+    private val exceptionParser: ExceptionParser
 ) : ViewModel() {
 
     val venueDetailsLiveData = MutableLiveData<VenueViewModel>()
@@ -38,7 +37,7 @@ class VenueDetailsViewModel @Inject constructor(
                     venueDetailsLiveData.value = venueDetailsDataMapper.transform(venue)
                 },
                 { throwable ->
-                    errorLiveData.value = exceptionHandler.parseException(throwable)
+                    errorLiveData.value = exceptionParser.parseException(throwable)
                 })
 
     }

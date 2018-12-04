@@ -1,4 +1,4 @@
-package ir.fallahpoor.vicinity.presentation.venuedetails.model
+package ir.fallahpoor.vicinity.presentation.venuedetails.viewmodel
 
 import ir.fallahpoor.vicinity.domain.model.Location
 import ir.fallahpoor.vicinity.domain.model.Venue
